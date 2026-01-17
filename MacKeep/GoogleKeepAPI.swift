@@ -76,18 +76,59 @@ class GoogleKeepAPI {
       }
     }.resume()
   }
+
+  func fetchNotes(completion: @escaping (Result<Int, Error>) -> Void) {
+    guard let authToken = authToken else {
+      completion(.failure(APIError.notAuthenticated))
+      return
+    }
+
+    let timestamp = String(format: "%.0f000", Date().timeIntervalSince1970)
+    let params: [String: Any] = [
+      "nodes": [],
+      "clientTimestamp": timestamp,
+    ]
+
+    var request = URLRequest(url: URL(string: "https://www.googleapis.com/notes/v1/changes")!)
+    request.httpMethod = "POST"
+    request.setValue("OAuth \(authToken)", forHTTPHeaderField: "Authorization")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.httpBody = try? JSONSerialization.data(withJSONObject: params)
+
+    URLSession.shared.dataTask(with: request) { data, response, error in
+      if let error = error {
+        completion(.failure(error))
+        return
+      }
+
+      guard let data = data else {
+        completion(.failure(APIError.noData))
+        return
+      }
+
+      do {
+        let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+        let nodes = (json?["nodes"] as? [[String: Any]]) ?? []
+        completion(.success(nodes.count))
+      } catch {
+        completion(.failure(error))
+      }
+    }.resume()
+  }
 }
 
 enum APIError: Error, LocalizedError {
   case noData
   case authenticationFailed
   case loginError(String)
+  case notAuthenticated
 
   var errorDescription: String? {
     switch self {
     case .noData: return "No data received"
     case .authenticationFailed: return "Authentication failed"
     case .loginError(let err): return "Login error: \(err)"
+    case .notAuthenticated: return "Not authenticated"
     }
   }
 }

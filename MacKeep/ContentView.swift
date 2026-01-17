@@ -101,19 +101,33 @@ struct ContentView: View {
 
     api.getOAuthToken { result in
       DispatchQueue.main.async {
-        isLoading = false
-
         switch result {
-        case .success(let oauthToken):
-          KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
-          alertMessage = "OAuth Token:\n\n\(oauthToken)"
-          isSuccess = true
-          showAlert = true
+        case .success:
+          api.fetchNotes { notesResult in
+            DispatchQueue.main.async {
+              isLoading = false
+              switch notesResult {
+              case .success(let count):
+                KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
+                alertMessage = "\(count) notes found"
+                isSuccess = true
+                showAlert = true
+
+              case .failure(let error):
+                alertMessage = error.localizedDescription
+                isSuccess = false
+                showAlert = true
+              }
+            }
+          }
 
         case .failure(let error):
-          alertMessage = error.localizedDescription
-          isSuccess = false
-          showAlert = true
+          DispatchQueue.main.async {
+            isLoading = false
+            alertMessage = error.localizedDescription
+            isSuccess = false
+            showAlert = true
+          }
         }
       }
     }
