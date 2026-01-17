@@ -1,3 +1,7 @@
 {
-  "sweetpad.build.xcodeWorkspacePath": "MacKeep.xcodeproj/project.xcworkspace"
+  "sweetpad.build.xcodeWorkspacePath": "MacKeep.xcodeproj/project.xcworkspace",
+  "editor.defaultFormatter": "vknabel.vscode-apple-swift-format",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true
 }
