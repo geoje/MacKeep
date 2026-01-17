@@ -12,6 +12,8 @@ struct ContentView: View {
     @State private var masterToken: String = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var isLoading = false
+    @State private var isSuccess = false
     
     var body: some View {
         VStack(spacing: 16) {
@@ -53,26 +55,34 @@ struct ContentView: View {
             }
             
             Button(action: {
-                KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
-                alertMessage = "0 notes found"
-                showAlert = true
+                loginToKeep()
             }) {
-                Text("Connect")
-                    .frame(maxWidth: .infinity)
-                    .padding(8)
-                    .background(.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(6)
-                    .font(.system(.body, design: .default, weight: .semibold))
+                HStack(spacing: 4) {
+                    Text("Connect")
+                    
+                    if isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(0.4)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(8)
+                .background(.blue)
+                .foregroundColor(.white)
+                .cornerRadius(6)
+                .font(.system(.body, design: .default, weight: .semibold))
             }
             .buttonStyle(.plain)
             .onHover { hovering in
-                if hovering {
+                if hovering && !isLoading {
                     NSCursor.pointingHand.push()
                 } else {
                     NSCursor.pop()
                 }
             }
+            .disabled(isLoading)
         }
         .padding(16)
         .frame(width: 240)
@@ -81,10 +91,36 @@ struct ContentView: View {
                 masterToken = token
             }
         }
-        .alert("Success", isPresented: $showAlert) {
+        .alert(isSuccess ? "✅ Success" : "❌ Error", isPresented: $showAlert) {
             Button("OK") { }
         } message: {
             Text(alertMessage)
+        }
+    }
+    
+    func loginToKeep() {
+        isLoading = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            let api = GoogleKeepAPI(email: email, masterToken: masterToken)
+            api.fetchNotes { result in
+                DispatchQueue.main.async {
+                    isLoading = false
+                    
+                    switch result {
+                    case .success(let notes):
+                        KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
+                        alertMessage = "\(notes.count) notes found"
+                        isSuccess = true
+                        showAlert = true
+                        
+                    case .failure(let error):
+                        alertMessage = "Error: \(error.localizedDescription)"
+                        isSuccess = false
+                        showAlert = true
+                    }
+                }
+            }
         }
     }
 }
