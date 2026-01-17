@@ -24,8 +24,9 @@ struct ContentView: View {
 
           Button(action: {
             if let url = URL(
-              string: "https://github.com/rukins/gpsoauth-java/blob/master/README.md#second-way")
-            {
+              string:
+                "https://github.com/rukins/gpsoauth-java/blob/master/README.md#second-way"
+            ) {
               NSWorkspace.shared.open(url)
             }
           }) {
@@ -96,40 +97,23 @@ struct ContentView: View {
   func loginToKeep() {
     isLoading = true
 
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-      let api = GoogleKeepAPI(email: email, masterToken: masterToken)
+    let api = GoogleKeepAPI(email: email, masterToken: masterToken)
 
-      api.authenticate { authResult in
-        DispatchQueue.main.async {
-          switch authResult {
-          case .success:
-            api.fetchNotes { notesResult in
-              DispatchQueue.main.async {
-                isLoading = false
+    api.getOAuthToken { result in
+      DispatchQueue.main.async {
+        isLoading = false
 
-                switch notesResult {
-                case .success(let notes):
-                  KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
-                  alertMessage = "\(notes.count) notes found"
-                  isSuccess = true
-                  showAlert = true
+        switch result {
+        case .success(let oauthToken):
+          KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
+          alertMessage = "OAuth Token:\n\n\(oauthToken)"
+          isSuccess = true
+          showAlert = true
 
-                case .failure(let error):
-                  alertMessage = "Error: \(error.localizedDescription)"
-                  isSuccess = false
-                  showAlert = true
-                }
-              }
-            }
-
-          case .failure(let error):
-            DispatchQueue.main.async {
-              isLoading = false
-              alertMessage = "Auth Error: \(error.localizedDescription)"
-              isSuccess = false
-              showAlert = true
-            }
-          }
+        case .failure(let error):
+          alertMessage = error.localizedDescription
+          isSuccess = false
+          showAlert = true
         }
       }
     }

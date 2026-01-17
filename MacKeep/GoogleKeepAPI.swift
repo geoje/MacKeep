@@ -4,126 +4,90 @@ class GoogleKeepAPI {
   let email: String
   let masterToken: String
   let deviceId: String
-
   private var authToken: String?
 
   init(email: String, masterToken: String) {
     self.email = email
     self.masterToken = masterToken
-    self.deviceId = UUID().uuidString.lowercased()
+    self.deviceId = UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "").prefix(
+      16
+    ).uppercased()
   }
 
-  func authenticate(completion: @escaping (Result<Void, Error>) -> Void) {
-    // Step 1: master_token으로 OAuth 토큰 획득
-    refreshAuthToken { result in
-      completion(result)
-    }
-  }
+  func getOAuthToken(completion: @escaping (Result<String, Error>) -> Void) {
+    let params = [
+      "accountType": "HOSTED_OR_GOOGLE",
+      "Email": email,
+      "has_permission": "1",
+      "EncryptedPasswd": masterToken,
+      "service": "memento",
+      "source": "android",
+      "androidId": deviceId,
+      "app": "com.google.android.keep",
+      "client_sig": "38918a453d07199354f8b19af05ec6562ced5788",
+      "device_country": "us",
+      "operatorCountry": "us",
+      "lang": "en",
+      "sdk_version": "17",
+      "google_play_services_version": "240913000",
+    ]
 
-  private func refreshAuthToken(completion: @escaping (Result<Void, Error>) -> Void) {
-    // gpsoauth의 perform_oauth를 모방
-    // master_token으로 OAuth 토큰 요청
-    let urlString = "https://android.clients.google.com/auth"
-    guard let url = URL(string: urlString) else {
-      completion(.failure(APIError.invalidURL))
-      return
-    }
+    let body = params.sorted { $0.key < $1.key }
+      .map {
+        "\($0.key)=\($0.value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? $0.value)"
+      }
+      .joined(separator: "&")
 
-    var request = URLRequest(url: url)
+    var request = URLRequest(url: URL(string: "https://android.clients.google.com/auth")!)
     request.httpMethod = "POST"
     request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-
-    let body =
-      "Email=\(email)&auth=\(masterToken)&service=memento&app_package=com.google.android.keep&client_sig=38918a453d07199354f8b19af05ec6562ced5788&device_id=\(deviceId)&Access_token=1&grant_type=oauth2&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-
+    request.setValue("GoogleAuth/1.4", forHTTPHeaderField: "User-Agent")
     request.httpBody = body.data(using: .utf8)
 
-    URLSession.shared.dataTask(with: request) { data, response, error in
+    URLSession.shared.dataTask(with: request) { data, _, error in
       if let error = error {
         completion(.failure(error))
         return
       }
 
-      guard let data = data,
-        let responseString = String(data: data, encoding: .utf8)
-      else {
+      guard let responseString = String(data: data ?? Data(), encoding: .utf8) else {
         completion(.failure(APIError.noData))
         return
       }
 
-      // Parse response: Auth=<token>
-      let lines = responseString.split(separator: "\n")
-      for line in lines {
-        if line.starts(with: "Auth=") {
-          self.authToken = String(line.dropFirst(5))
-          completion(.success(()))
-          return
+      var result: [String: String] = [:]
+      responseString.split(separator: "\n").forEach { line in
+        let parts = line.split(separator: "=", maxSplits: 1)
+        if parts.count == 2 {
+          result[String(parts[0])] = String(parts[1])
         }
       }
 
-      completion(.failure(APIError.authenticationFailed))
-    }.resume()
-  }
-
-  func fetchNotes(completion: @escaping (Result<[Note], Error>) -> Void) {
-    guard let authToken = authToken else {
-      completion(.failure(APIError.notAuthenticated))
-      return
-    }
-
-    let urlString = "https://www.googleapis.com/notes/v1/changes"
-    guard let url = URL(string: urlString) else {
-      completion(.failure(APIError.invalidURL))
-      return
-    }
-
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-    request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-    let params: [String: Any] = [
-      "nodes": [],
-      "clientTimestamp": String(format: "%.3f", Date().timeIntervalSince1970),
-    ]
-
-    request.httpBody = try? JSONSerialization.data(withJSONObject: params)
-
-    URLSession.shared.dataTask(with: request) { data, response, error in
-      if let error = error {
-        completion(.failure(error))
+      if let error = result["Error"] {
+        completion(.failure(APIError.loginError(error)))
         return
       }
 
-      guard let data = data else {
-        completion(.failure(APIError.noData))
-        return
-      }
-
-      do {
-        let decoder = JSONDecoder()
-        let response = try decoder.decode(NotesResponse.self, from: data)
-        completion(.success(response.nodes ?? []))
-      } catch {
-        completion(.failure(error))
+      if let auth = result["Auth"] {
+        self.authToken = auth
+        completion(.success(auth))
+      } else {
+        completion(.failure(APIError.authenticationFailed))
       }
     }.resume()
   }
 }
 
-struct Note: Codable {
-  let id: String
-  let title: String?
-  let text: String?
-}
-
-struct NotesResponse: Codable {
-  let nodes: [Note]?
-}
-
-enum APIError: Error {
-  case invalidURL
+enum APIError: Error, LocalizedError {
   case noData
   case authenticationFailed
-  case notAuthenticated
+  case loginError(String)
+
+  var errorDescription: String? {
+    switch self {
+    case .noData: return "No data received"
+    case .authenticationFailed: return "Authentication failed"
+    case .loginError(let err): return "Login error: \(err)"
+    }
+  }
 }
