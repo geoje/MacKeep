@@ -3,6 +3,11 @@ import Foundation
 class GPSAuthAPI {
   var onLog: ((String) -> Void)?
 
+  private func generateRandomAndroidId() -> String {
+    let random = UInt64.random(in: 0...UInt64.max)
+    return String(format: "%016x", random)
+  }
+
   private func log(_ message: String) {
     DispatchQueue.main.async {
       self.onLog?(message)
@@ -17,21 +22,26 @@ class GPSAuthAPI {
     let url = URL(string: "https://android.clients.google.com/auth")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
+    request.addValue("indetity", forHTTPHeaderField: "Accept-Encoding")
     request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+    request.addValue("GoogleAuth/1.4", forHTTPHeaderField: "User-Agent")
 
     let bodyParameters: [String: Any] = [
       "accountType": "HOSTED_OR_GOOGLE",
       "Email": email,
-      "master_token": masterToken,
+      "has_permission": 1,
+      "EncryptedPasswd": masterToken,
       "service":
         "oauth2:https://www.googleapis.com/auth/memento https://www.googleapis.com/auth/reminders",
       "source": "android",
+      "androidId": generateRandomAndroidId(),
       "app": "com.google.android.keep",
       "client_sig": "38918a453d07199354f8b19af05ec6562ced5788",
       "device_country": "us",
       "operatorCountry": "us",
       "lang": "en",
-      "sdk_version": "28",
+      "sdk_version": 17,
+      "google_play_services_version": 240_913_000,
     ]
 
     request.httpBody =
@@ -44,8 +54,6 @@ class GPSAuthAPI {
       }
       .joined(separator: "&")
       .data(using: .utf8)
-
-    log("OAuth Request Body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")")
 
     let task = URLSession.shared.dataTask(with: request) { data, response, error in
       if let error = error {
