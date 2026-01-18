@@ -9,17 +9,35 @@ class GoogleKeepAPI {
     }
   }
 
+  private let clientSessionId: String
+
+  init() {
+    let timestamp = Int(Date().timeIntervalSince1970 * 1000)
+    let randomInt = UInt32.random(in: 0...UInt32.max)
+    self.clientSessionId = "s--\(timestamp)--\(randomInt)"
+  }
+
   func fetchNotes(authToken: String, completion: @escaping (Result<[Note], Error>) -> Void) {
     log("Attempting to fetch notes...")
     let url = URL(string: "https://www.googleapis.com/notes/v1/changes")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.addValue(
+      "x-mackeep/1.0.0 (https://github.com/geoje/mackeep)", forHTTPHeaderField: "User-Agent")
+    request.addValue("gzip, deflate", forHTTPHeaderField: "Accept-Encoding")
+    request.addValue("*/*", forHTTPHeaderField: "Accept")
+    request.addValue("keep-alive", forHTTPHeaderField: "Connection")
     request.addValue("OAuth \(authToken)", forHTTPHeaderField: "Authorization")
+    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
     let requestBody: [String: Any] = [
-      "clientTimestamp": String(Int(Date().timeIntervalSince1970 * 1000)),
+      "nodes": [],
+      "clientTimestamp": formatter.string(from: Date()),
       "requestHeader": [
+        "clientSessionId": self.clientSessionId,
         "clientPlatform": "ANDROID",
         "clientVersion": ["major": "9", "minor": "9", "build": "9", "revision": "9"],
         "capabilities": [
@@ -32,9 +50,6 @@ class GoogleKeepAPI {
 
     do {
       request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
-      log(
-        "Fetch Notes Request Body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "")"
-      )
     } catch {
       log("Error serializing request body: \(error.localizedDescription)")
       completion(.failure(error))
@@ -79,9 +94,11 @@ class GoogleKeepAPI {
           let nodes = json["nodes"] as? [[String: Any]]
         {
           self.log("Successfully fetched and parsed \(nodes.count) nodes.")
-          // For now, we just return an empty array as we are focusing on the request itself.
-          // We will parse the notes properly later.
-          completion(.success([]))
+          let decoder = JSONDecoder()
+          let notes = nodes.compactMap {
+            try? decoder.decode(Note.self, from: JSONSerialization.data(withJSONObject: $0))
+          }
+          completion(.success(notes))
         } else {
           self.log("Successfully fetched data, but failed to parse notes.")
           completion(.success([]))
@@ -97,7 +114,9 @@ class GoogleKeepAPI {
 
 struct Note: Codable, Identifiable {
   var id: String
-  var text: String
+  var text: String?
+  var parentId: String?
+  var isArchived: Bool?
 }
 
 enum APIError: Error, LocalizedError {

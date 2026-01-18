@@ -17,7 +17,7 @@ struct ContentView: View {
       debugLogView()
     }
     .padding(16)
-    .frame(minWidth: 280, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
+    .frame(minWidth: 240, maxWidth: .infinity, minHeight: 320, maxHeight: .infinity)
     .alert(isSuccess ? "✅ Success" : "❌ Error", isPresented: $showAlert) {
       Button("OK") {}
     } message: {
@@ -96,12 +96,18 @@ struct ContentView: View {
             }
             .buttonStyle(.plain)
           }
-          ScrollView {
-            Text(debugLogs.joined(separator: "\n"))
-              .font(.system(size: 10, design: .monospaced))
-              .foregroundColor(.gray)
-              .frame(maxWidth: .infinity, alignment: .topLeading)
-              .textSelection(.enabled)
+          ScrollViewReader { proxy in
+            ScrollView {
+              Text(debugLogs.joined(separator: "\n"))
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundColor(.gray)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .textSelection(.enabled)
+                .id("logBottom")
+            }
+            .onChange(of: debugLogs) { oldValue, newValue in
+              proxy.scrollTo("logBottom", anchor: .bottom)
+            }
           }
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .padding(8)
@@ -143,7 +149,11 @@ struct ContentView: View {
               self.isLoading = false
               switch notesResult {
               case .success(let notes):
-                self.alertMessage = "\(notes.count) notes found"
+                let filteredNotes = notes.filter {
+                  $0.parentId == "root" && ($0.isArchived ?? false) == false
+                }
+                self.alertMessage =
+                  "\(filteredNotes.count) notes found\n\nNow try adding a widget from Notification Center or your Desktop!"
                 self.isSuccess = true
                 self.showAlert = true
               case .failure(let error):
