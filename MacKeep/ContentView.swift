@@ -163,7 +163,7 @@ struct ContentView: View {
               case .success(let notes):
                 // Save notes for the widget via shared UserDefaults
                 if let data = try? JSONEncoder().encode(notes) {
-                  self.defaults.set(data, forKey: "notes")
+                  self.defaults.set(data, forKey: "nodes")
                 }
 
                 let filteredNotes = notes.filter {

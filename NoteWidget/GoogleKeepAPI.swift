@@ -6,6 +6,9 @@ struct Note: Codable, Identifiable {
   var text: String?
   var parentId: String?
   var isArchived: Bool?
+  var type: String?
+  var checked: Bool?
+  var color: String?
 }
 
 class GoogleKeepAPI {

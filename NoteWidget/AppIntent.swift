@@ -17,30 +17,20 @@ struct WidgetNoteEntity: AppEntity {
 
 struct WidgetNoteQuery: EntityQuery {
   func suggestedEntities() async throws -> [WidgetNoteEntity] {
-    let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
-    guard let data = defaults.data(forKey: "notes"),
-      let notes = try? JSONDecoder().decode([Note].self, from: data)
-    else {
-      return []
-    }
-
+    let notes = NoteManager.getSharedNotes()
     let entities = notes.map { note in
-      let displayTitle = note.title ?? note.text ?? "Untitled"
+      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespaces) ?? ""
+      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : (note.text ?? "Untitled")
       return WidgetNoteEntity(id: note.id, title: displayTitle)
     }
     return entities
   }
 
   nonisolated func defaultResult() async -> [WidgetNoteEntity]? {
-    let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
-    guard let data = defaults.data(forKey: "notes"),
-      let notes = try? JSONDecoder().decode([Note].self, from: data)
-    else {
-      return []
-    }
-
+    let notes = NoteManager.getSharedNotes()
     let entities = notes.map { note in
-      let displayTitle = note.title ?? note.text ?? "Untitled"
+      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespaces) ?? ""
+      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : (note.text ?? "Untitled")
       return WidgetNoteEntity(id: note.id, title: displayTitle)
     }
     return entities

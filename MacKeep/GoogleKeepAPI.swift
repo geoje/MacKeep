@@ -1,5 +1,16 @@
 import Foundation
 
+struct Note: Codable, Identifiable {
+  var id: String
+  var title: String?
+  var text: String?
+  var parentId: String?
+  var isArchived: Bool?
+  var type: String?
+  var checked: Bool?
+  var color: String?
+}
+
 class GoogleKeepAPI {
   var onLog: ((String) -> Void)?
 
@@ -110,14 +121,6 @@ class GoogleKeepAPI {
     }
     task.resume()
   }
-}
-
-struct Note: Codable, Identifiable {
-  var id: String
-  var title: String?
-  var text: String?
-  var parentId: String?
-  var isArchived: Bool?
 }
 
 enum APIError: Error, LocalizedError {
