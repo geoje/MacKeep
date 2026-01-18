@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-  @State private var email: String = ""
+  @AppStorage("email") var email: String = ""
   @State private var masterToken: String = ""
   @State private var showAlert = false
   @State private var alertMessage = ""
@@ -83,19 +83,14 @@ struct ContentView: View {
     .padding(16)
     .frame(width: 240)
     .onAppear {
-      loadCredentials()
+      if let token = KeychainHelper.standard.retrieve(forKey: "GoogleMasterToken") {
+        masterToken = token
+      }
     }
     .alert(isSuccess ? "✅ Success" : "❌ Error", isPresented: $showAlert) {
       Button("OK") {}
     } message: {
       Text(alertMessage)
-    }
-  }
-
-  func loadCredentials() {
-    if let credentials = KeychainHelper.standard.retrieveCredentials() {
-      email = credentials.email
-      masterToken = credentials.masterToken
     }
   }
 
@@ -113,10 +108,7 @@ struct ContentView: View {
               isLoading = false
               switch notesResult {
               case .success(let count):
-                KeychainHelper.standard.saveCredentials(
-                  email: email,
-                  masterToken: masterToken
-                )
+                KeychainHelper.standard.save(masterToken, forKey: "GoogleMasterToken")
                 alertMessage = "\(count) notes found"
                 isSuccess = true
                 showAlert = true
