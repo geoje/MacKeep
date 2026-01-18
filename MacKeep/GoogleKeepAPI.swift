@@ -34,7 +34,7 @@ class GoogleKeepAPI {
     }
   }
 
-  func GoogleKeepAPI(completion: @escaping (Result<Int, Error>) -> Void) {
+  func fetchNotes(completion: @escaping (Result<Int, Error>) -> Void) {
     guard let authToken = authToken else {
       self.log("[GoogleKeepAPI] ERROR: Not authenticated")
       completion(.failure(APIError.notAuthenticated))
@@ -78,7 +78,7 @@ class GoogleKeepAPI {
         ],
       ]
 
-      // Add targetVersion if not the first sync
+      // Add targetVersion for pagination
       if currentVersion != "0" {
         params["targetVersion"] = currentVersion
       }
@@ -98,6 +98,18 @@ class GoogleKeepAPI {
       URLSession.shared.dataTask(with: request) { data, response, error in
         if let error = error {
           self.log("[GoogleKeepAPI] Network Error: \(error.localizedDescription)")
+          completion(.failure(error))
+          return
+        }
+
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+          let error = NSError(
+            domain: "", code: httpResponse.statusCode,
+            userInfo: [NSLocalizedDescriptionKey: "HTTP Error: \(httpResponse.statusCode)"])
+          self.log("Sync failed with status code: \(httpResponse.statusCode)")
+          if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+            self.log("Error response body: \(responseBody)")
+          }
           completion(.failure(error))
           return
         }
@@ -140,24 +152,31 @@ class GoogleKeepAPI {
 
           self.log("[GoogleKeepAPI] Total notes collected so far: \(allNotes.count)")
 
-          // Check if there are more results
-          if let nextPageToken = json?["nextPageToken"] as? String {
-            self.log("[GoogleKeepAPI] Found nextPageToken, fetching next page...")
-            currentVersion = nextPageToken
-            syncNotes()
+          if let toVersion = json?["toVersion"] as? String {
+            self.log("[GoogleKeepAPI] Found toVersion, checking if truncated...")
+            currentVersion = toVersion
+
+            if let truncated = json?["truncated"] as? Bool, truncated {
+              self.log("[GoogleKeepAPI] Response truncated, fetching more...")
+              syncNotes()
+            } else {
+              self.log("[GoogleKeepAPI] Not truncated, processing all notes...")
+              let notes = allNotes.filter { node in
+                let parentId = node["parentId"] as? String
+                let type = node["type"] as? String
+                return (parentId == nil || parentId == "root") && type == "NOTE"
+              }
+              self.log("[GoogleKeepAPI] Final filtered notes count: \(notes.count)")
+              completion(.success(notes.count))
+            }
           } else {
-            self.log("[GoogleKeepAPI] No nextPageToken, processing all notes...")
-            // All notes fetched, filter for root level notes
+            self.log("[GoogleKeepAPI] No toVersion in response, processing all notes...")
             let notes = allNotes.filter { node in
               let parentId = node["parentId"] as? String
               let type = node["type"] as? String
               return (parentId == nil || parentId == "root") && type == "NOTE"
             }
             self.log("[GoogleKeepAPI] Final filtered notes count: \(notes.count)")
-            for (index, note) in notes.enumerated() {
-              let noteId = note["id"] as? String ?? "unknown"
-              self.log("[GoogleKeepAPI]   Note \(index): \(noteId)")
-            }
             completion(.success(notes.count))
           }
         } catch {

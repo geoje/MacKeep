@@ -119,9 +119,6 @@ struct ContentView: View {
       from: Date(), dateStyle: .none, timeStyle: .medium)
     let logMessage = "[\(timestamp)] \(message)"
     debugLogs.append(logMessage)
-    if debugLogs.count > 50 {
-      debugLogs.removeFirst()
-    }
   }
 
   private func loginToKeep() {
@@ -135,7 +132,7 @@ struct ContentView: View {
       DispatchQueue.main.async {
         switch result {
         case .success:
-          api.GoogleKeepAPI { notesResult in
+          api.fetchNotes { notesResult in
             DispatchQueue.main.async { self.handleFetchResult(notesResult) }
           }
         case .failure(let error):
