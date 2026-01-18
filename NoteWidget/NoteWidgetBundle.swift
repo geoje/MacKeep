@@ -1,17 +1,10 @@
-//
-//  NoteWidgetBundle.swift
-//  NoteWidget
-//
-//  Created by Gyeongho Yang on 18.01.26.
-//
-
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct NoteWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        NoteWidget()
-        NoteWidgetControl()
-    }
+  var body: some Widget {
+    NoteWidget()
+    NoteWidgetControl()
+  }
 }

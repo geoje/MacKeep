@@ -114,6 +114,7 @@ class GoogleKeepAPI {
 
 struct Note: Codable, Identifiable {
   var id: String
+  var title: String?
   var text: String?
   var parentId: String?
   var isArchived: Bool?

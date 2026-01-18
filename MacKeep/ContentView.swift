@@ -142,6 +142,9 @@ struct ContentView: View {
       DispatchQueue.main.async {
         switch result {
         case .success(let authToken):
+          // Save authToken to UserDefaults for widget access
+          UserDefaults.standard.set(authToken, forKey: "authToken")
+
           let keepAPI = GoogleKeepAPI()
           keepAPI.onLog = self.addLog
           keepAPI.fetchNotes(authToken: authToken) { notesResult in
@@ -149,6 +152,11 @@ struct ContentView: View {
               self.isLoading = false
               switch notesResult {
               case .success(let notes):
+                // Save notes for the widget via standard UserDefaults
+                if let data = try? JSONEncoder().encode(notes) {
+                  UserDefaults.standard.set(data, forKey: "notes")
+                }
+
                 let filteredNotes = notes.filter {
                   $0.parentId == "root" && ($0.isArchived ?? false) == false
                 }
