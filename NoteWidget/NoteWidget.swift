@@ -1,15 +1,17 @@
 import SwiftUI
 import WidgetKit
 
-struct Note: Codable, Identifiable {
-  var id: String
-  var title: String?
-  var text: String?
-  var parentId: String?
-  var isArchived: Bool?
-}
-
 struct Provider: AppIntentTimelineProvider {
+  private func getSharedNotes() -> [Note] {
+    let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
+    guard let data = defaults.data(forKey: "notes"),
+      let notes = try? JSONDecoder().decode([Note].self, from: data)
+    else {
+      return []
+    }
+    return notes
+  }
+
   func placeholder(in context: Context) -> SimpleEntry {
     SimpleEntry(
       note: Note(
@@ -19,11 +21,7 @@ struct Provider: AppIntentTimelineProvider {
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry
   {
     let selectedId = configuration.note?.id
-    var notes = await fetchNotesFromAPI()
-
-    if notes.isEmpty {
-      notes = await fetchNotesFromCache()
-    }
+    let notes = getSharedNotes()
 
     let note =
       notes.first(where: { $0.id == selectedId }) ?? notes.first(where: {
@@ -38,13 +36,8 @@ struct Provider: AppIntentTimelineProvider {
   func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<
     SimpleEntry
   > {
-    var notes = await fetchNotesFromAPI()
-
-    if notes.isEmpty {
-      notes = await fetchNotesFromCache()
-    }
-
     let selectedId = configuration.note?.id
+    let notes = getSharedNotes()
     let note: Note
 
     if let selected = notes.first(where: { $0.id == selectedId }) {
@@ -56,7 +49,8 @@ struct Provider: AppIntentTimelineProvider {
     } else if !notes.isEmpty {
       note = notes[0]
     } else {
-      let hasToken = UserDefaults.standard.string(forKey: "authToken") != nil
+      let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
+      let hasToken = defaults.string(forKey: "authToken") != nil
       let message = hasToken ? "Tap to refresh notes" : "Open Mac Keep app to connect"
       note = Note(
         id: "placeholder", title: nil, text: message, parentId: "root", isArchived: false)
@@ -66,37 +60,6 @@ struct Provider: AppIntentTimelineProvider {
 
     let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
     return Timeline(entries: [entry], policy: .after(nextUpdate))
-  }
-
-  private func fetchNotesFromAPI() async -> [Note] {
-    guard let authToken = UserDefaults.standard.string(forKey: "authToken") else {
-      return []
-    }
-
-    return await withCheckedContinuation { continuation in
-      let api = GoogleKeepAPI()
-      api.fetchNotes(authToken: authToken) { result in
-        switch result {
-        case .success(let notes):
-          // Cache the notes
-          if let data = try? JSONEncoder().encode(notes) {
-            UserDefaults.standard.set(data, forKey: "cachedNotes")
-          }
-          continuation.resume(returning: notes)
-        case .failure:
-          continuation.resume(returning: [])
-        }
-      }
-    }
-  }
-
-  private func fetchNotesFromCache() async -> [Note] {
-    guard let data = UserDefaults.standard.data(forKey: "cachedNotes"),
-      let notes = try? JSONDecoder().decode([Note].self, from: data)
-    else {
-      return []
-    }
-    return notes
   }
 }
 

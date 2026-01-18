@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
-  @AppStorage("email") var email: String = ""
-  @AppStorage("masterToken") var masterToken: String = ""
+  @State private var email: String = ""
+  @State private var masterToken: String = ""
   @State private var showAlert = false
   @State private var alertMessage = ""
   @State private var isLoading = false
   @State private var isSuccess = false
   @State private var debugLogs: [String] = []
+
+  private let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
 
   var body: some View {
     VStack(spacing: 16) {
@@ -22,6 +24,11 @@ struct ContentView: View {
       Button("OK") {}
     } message: {
       Text(alertMessage)
+    }
+    .onAppear {
+      // App Group에서 저장된 값 로드
+      email = defaults.string(forKey: "email") ?? ""
+      masterToken = defaults.string(forKey: "masterToken") ?? ""
     }
   }
 
@@ -142,8 +149,10 @@ struct ContentView: View {
       DispatchQueue.main.async {
         switch result {
         case .success(let authToken):
-          // Save authToken to UserDefaults for widget access
-          UserDefaults.standard.set(authToken, forKey: "authToken")
+          // Save email, masterToken, authToken to shared UserDefaults
+          self.defaults.set(self.email, forKey: "email")
+          self.defaults.set(self.masterToken, forKey: "masterToken")
+          self.defaults.set(authToken, forKey: "authToken")
 
           let keepAPI = GoogleKeepAPI()
           keepAPI.onLog = self.addLog
@@ -152,9 +161,9 @@ struct ContentView: View {
               self.isLoading = false
               switch notesResult {
               case .success(let notes):
-                // Save notes for the widget via standard UserDefaults
+                // Save notes for the widget via shared UserDefaults
                 if let data = try? JSONEncoder().encode(notes) {
-                  UserDefaults.standard.set(data, forKey: "notes")
+                  self.defaults.set(data, forKey: "notes")
                 }
 
                 let filteredNotes = notes.filter {
