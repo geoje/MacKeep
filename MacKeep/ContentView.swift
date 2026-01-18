@@ -123,17 +123,33 @@ struct ContentView: View {
 
   private func loginToKeep() {
     isLoading = true
-    let api = GoogleKeepAPI(email: email, masterToken: masterToken)
-    api.onLog = { message in
-      DispatchQueue.main.async { self.addLog(message) }
-    }
+    debugLogs.removeAll()
 
-    api.getOAuthToken { result in
+    let gpsAuthAPI = GPSAuthAPI()
+    gpsAuthAPI.onLog = self.addLog
+
+    let deviceId = UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "").prefix(16)
+      .uppercased()
+
+    gpsAuthAPI.performOAuth(email: email, masterToken: masterToken, deviceId: String(deviceId)) {
+      result in
       DispatchQueue.main.async {
         switch result {
-        case .success:
-          api.fetchNotes { notesResult in
-            DispatchQueue.main.async { self.handleFetchResult(notesResult) }
+        case .success(let authToken):
+          let keepAPI = GoogleKeepAPI()
+          keepAPI.onLog = self.addLog
+          keepAPI.fetchNotes(authToken: authToken) { notesResult in
+            DispatchQueue.main.async {
+              self.isLoading = false
+              switch notesResult {
+              case .success(let notes):
+                self.alertMessage = "\(notes.count) notes found"
+                self.isSuccess = true
+                self.showAlert = true
+              case .failure(let error):
+                self.showError(error.localizedDescription)
+              }
+            }
           }
         case .failure(let error):
           self.showError(error.localizedDescription)
@@ -142,25 +158,12 @@ struct ContentView: View {
     }
   }
 
-  private func handleFetchResult(_ result: Result<Int, Error>) {
-    isLoading = false
-    switch result {
-    case .success(let count):
-      alertMessage = "\(count) notes found"
-      isSuccess = true
-    case .failure(let error):
-      alertMessage = error.localizedDescription
-      isSuccess = false
-    }
-    showAlert = true
-  }
-
   private func showError(_ message: String) {
     DispatchQueue.main.async {
-      isLoading = false
-      alertMessage = message
-      isSuccess = false
-      showAlert = true
+      self.isLoading = false
+      self.alertMessage = message
+      self.isSuccess = false
+      self.showAlert = true
     }
   }
 }
