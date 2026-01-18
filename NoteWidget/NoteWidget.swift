@@ -4,11 +4,17 @@ import WidgetKit
 struct Provider: AppIntentTimelineProvider {
   private func getSharedNotes() -> [Note] {
     let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
-    guard let data = defaults.data(forKey: "notes"),
-      let notes = try? JSONDecoder().decode([Note].self, from: data)
-    else {
+    guard let data = defaults.data(forKey: "notes") else {
+      print("DEBUG: notes 데이터 없음")
       return []
     }
+
+    guard let notes = try? JSONDecoder().decode([Note].self, from: data) else {
+      print("DEBUG: notes 디코딩 실패")
+      return []
+    }
+
+    print("DEBUG: notes 읽음 - \(notes.count)개")
     return notes
   }
 
@@ -73,23 +79,14 @@ struct NoteWidgetEntryView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      if let title = entry.note.title, !title.isEmpty {
-        Text(title)
-          .font(.system(size: 16, weight: .semibold))
-          .lineLimit(2)
-      }
+      Text(entry.note.title?.isEmpty == false ? entry.note.title! : "Untitled")
+        .font(.system(size: 16, weight: .semibold))
+        .lineLimit(2)
 
-      if let text = entry.note.text, !text.isEmpty {
-        Text(text)
-          .font(.system(size: 14))
-          .lineLimit(entry.note.title != nil ? 8 : 10)
-          .foregroundColor(.secondary)
-      }
-
-      if entry.note.title == nil && (entry.note.text == nil || entry.note.text!.isEmpty) {
-        Text("Empty note")
-          .foregroundColor(.secondary)
-      }
+      Text(entry.note.text?.isEmpty == false ? entry.note.text! : "No Content")
+        .font(.system(size: 14))
+        .lineLimit(entry.note.title != nil && !entry.note.title!.isEmpty ? 8 : 10)
+        .foregroundColor(.secondary)
 
       Spacer()
     }

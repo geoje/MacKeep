@@ -31,6 +31,21 @@ struct WidgetNoteQuery: EntityQuery {
     return entities
   }
 
+  nonisolated func defaultResult() async -> [WidgetNoteEntity]? {
+    let defaults = UserDefaults(suiteName: "group.kr.ygh.MacKeep")!
+    guard let data = defaults.data(forKey: "notes"),
+      let notes = try? JSONDecoder().decode([Note].self, from: data)
+    else {
+      return []
+    }
+
+    let entities = notes.map { note in
+      let displayTitle = note.title ?? note.text ?? "Untitled"
+      return WidgetNoteEntity(id: note.id, title: displayTitle)
+    }
+    return entities
+  }
+
   func entities(for identifiers: [String]) async throws -> [WidgetNoteEntity] {
     let all = try await suggestedEntities()
     let set = Set(identifiers)
