@@ -7,18 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		85789E3C2F1C1B0D004E27AB /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3B2F1C1B0D004E27AB /* WidgetKit.framework */; };
-		85789E3E2F1C1B0D004E27AB /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3D2F1C1B0D004E27AB /* SwiftUI.framework */; };
-		85789E4D2F1C1B0D004E27AB /* KeepWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 85789E392F1C1B0D004E27AB /* KeepWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		855CB18F2F1D418E00156613 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3B2F1C1B0D004E27AB /* WidgetKit.framework */; };
+		855CB1902F1D418E00156613 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3D2F1C1B0D004E27AB /* SwiftUI.framework */; };
+		855CB19F2F1D418F00156613 /* NoteWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		85789E4B2F1C1B0D004E27AB /* PBXContainerItemProxy */ = {
+		855CB19D2F1D418F00156613 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 85789E1F2F1C1A32004E27AB /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 85789E382F1C1B0D004E27AB;
-			remoteInfo = KeepWidgetExtension;
+			remoteGlobalIDString = 855CB18D2F1D418E00156613;
+			remoteInfo = NoteWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -29,7 +29,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				85789E4D2F1C1B0D004E27AB /* KeepWidgetExtension.appex in Embed Foundation Extensions */,
+				855CB19F2F1D418F00156613 /* NoteWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -37,52 +37,52 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NoteWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		85789E272F1C1A32004E27AB /* Mac Keep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mac Keep.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		85789E392F1C1B0D004E27AB /* KeepWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KeepWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		85789E3B2F1C1B0D004E27AB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		85789E3D2F1C1B0D004E27AB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		85789E4E2F1C1B0D004E27AB /* Exceptions for "KeepWidget" folder in "KeepWidgetExtension" target */ = {
+		855CB1A02F1D418F00156613 /* Exceptions for "NoteWidget" folder in "NoteWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 85789E382F1C1B0D004E27AB /* KeepWidgetExtension */;
+			target = 855CB18D2F1D418E00156613 /* NoteWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		855CB1912F1D418E00156613 /* NoteWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				855CB1A02F1D418F00156613 /* Exceptions for "NoteWidget" folder in "NoteWidgetExtension" target */,
+			);
+			path = NoteWidget;
+			sourceTree = "<group>";
+		};
 		85789E292F1C1A32004E27AB /* MacKeep */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MacKeep;
 			sourceTree = "<group>";
 		};
-		85789E3F2F1C1B0D004E27AB /* KeepWidget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				85789E4E2F1C1B0D004E27AB /* Exceptions for "KeepWidget" folder in "KeepWidgetExtension" target */,
-			);
-			path = KeepWidget;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		855CB18B2F1D418E00156613 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				855CB1902F1D418E00156613 /* SwiftUI.framework in Frameworks */,
+				855CB18F2F1D418E00156613 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		85789E242F1C1A32004E27AB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		85789E362F1C1B0D004E27AB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				85789E3E2F1C1B0D004E27AB /* SwiftUI.framework in Frameworks */,
-				85789E3C2F1C1B0D004E27AB /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				85789E292F1C1A32004E27AB /* MacKeep */,
-				85789E3F2F1C1B0D004E27AB /* KeepWidget */,
+				855CB1912F1D418E00156613 /* NoteWidget */,
 				85789E3A2F1C1B0D004E27AB /* Frameworks */,
 				85789E282F1C1A32004E27AB /* Products */,
 			);
@@ -103,7 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				85789E272F1C1A32004E27AB /* Mac Keep.app */,
-				85789E392F1C1B0D004E27AB /* KeepWidgetExtension.appex */,
+				855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -120,6 +120,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		855CB18D2F1D418E00156613 /* NoteWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 855CB1A12F1D418F00156613 /* Build configuration list for PBXNativeTarget "NoteWidgetExtension" */;
+			buildPhases = (
+				855CB18A2F1D418E00156613 /* Sources */,
+				855CB18B2F1D418E00156613 /* Frameworks */,
+				855CB18C2F1D418E00156613 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				855CB1912F1D418E00156613 /* NoteWidget */,
+			);
+			name = NoteWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = NoteWidgetExtension;
+			productReference = 855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		85789E262F1C1A32004E27AB /* MacKeep */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 85789E322F1C1A32004E27AB /* Build configuration list for PBXNativeTarget "MacKeep" */;
@@ -132,7 +154,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				85789E4C2F1C1B0D004E27AB /* PBXTargetDependency */,
+				855CB19E2F1D418F00156613 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				85789E292F1C1A32004E27AB /* MacKeep */,
@@ -144,28 +166,6 @@
 			productReference = 85789E272F1C1A32004E27AB /* Mac Keep.app */;
 			productType = "com.apple.product-type.application";
 		};
-		85789E382F1C1B0D004E27AB /* KeepWidgetExtension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 85789E4F2F1C1B0D004E27AB /* Build configuration list for PBXNativeTarget "KeepWidgetExtension" */;
-			buildPhases = (
-				85789E352F1C1B0D004E27AB /* Sources */,
-				85789E362F1C1B0D004E27AB /* Frameworks */,
-				85789E372F1C1B0D004E27AB /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				85789E3F2F1C1B0D004E27AB /* KeepWidget */,
-			);
-			name = KeepWidgetExtension;
-			packageProductDependencies = (
-			);
-			productName = KeepWidgetExtension;
-			productReference = 85789E392F1C1B0D004E27AB /* KeepWidgetExtension.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -176,10 +176,10 @@
 				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 2620;
 				TargetAttributes = {
-					85789E262F1C1A32004E27AB = {
+					855CB18D2F1D418E00156613 = {
 						CreatedOnToolsVersion = 26.2;
 					};
-					85789E382F1C1B0D004E27AB = {
+					85789E262F1C1A32004E27AB = {
 						CreatedOnToolsVersion = 26.2;
 					};
 				};
@@ -199,20 +199,20 @@
 			projectRoot = "";
 			targets = (
 				85789E262F1C1A32004E27AB /* MacKeep */,
-				85789E382F1C1B0D004E27AB /* KeepWidgetExtension */,
+				855CB18D2F1D418E00156613 /* NoteWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		85789E252F1C1A32004E27AB /* Resources */ = {
+		855CB18C2F1D418E00156613 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		85789E372F1C1B0D004E27AB /* Resources */ = {
+		85789E252F1C1A32004E27AB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -222,14 +222,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		85789E232F1C1A32004E27AB /* Sources */ = {
+		855CB18A2F1D418E00156613 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		85789E352F1C1B0D004E27AB /* Sources */ = {
+		85789E232F1C1A32004E27AB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -239,14 +239,74 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		85789E4C2F1C1B0D004E27AB /* PBXTargetDependency */ = {
+		855CB19E2F1D418F00156613 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 85789E382F1C1B0D004E27AB /* KeepWidgetExtension */;
-			targetProxy = 85789E4B2F1C1B0D004E27AB /* PBXContainerItemProxy */;
+			target = 855CB18D2F1D418E00156613 /* NoteWidgetExtension */;
+			targetProxy = 855CB19D2F1D418F00156613 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		855CB1A22F1D418F00156613 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NoteWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NoteWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kr.ygh.MacKeep.NoteWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		855CB1A32F1D418F00156613 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = NoteWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NoteWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = kr.ygh.MacKeep.NoteWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		85789E302F1C1A32004E27AB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -445,69 +505,18 @@
 			};
 			name = Release;
 		};
-		85789E502F1C1B0D004E27AB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_APP_SANDBOX = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = KeepWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KeepWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kr.ygh.MacKeep.KeepWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		85789E512F1C1B0D004E27AB /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_APP_SANDBOX = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = KeepWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = KeepWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 26.2;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = kr.ygh.MacKeep.KeepWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		855CB1A12F1D418F00156613 /* Build configuration list for PBXNativeTarget "NoteWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				855CB1A22F1D418F00156613 /* Debug */,
+				855CB1A32F1D418F00156613 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		85789E222F1C1A32004E27AB /* Build configuration list for PBXProject "MacKeep" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -522,15 +531,6 @@
 			buildConfigurations = (
 				85789E332F1C1A32004E27AB /* Debug */,
 				85789E342F1C1A32004E27AB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		85789E4F2F1C1B0D004E27AB /* Build configuration list for PBXNativeTarget "KeepWidgetExtension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				85789E502F1C1B0D004E27AB /* Debug */,
-				85789E512F1C1B0D004E27AB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
