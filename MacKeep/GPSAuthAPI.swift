@@ -41,8 +41,9 @@ class GPSAuthAPI {
     request.setValue("GoogleAuth/1.4", forHTTPHeaderField: "User-Agent")
     request.httpBody = body.data(using: .utf8)
 
-    URLSession.shared.dataTask(with: request) { data, _, error in
+    URLSession.shared.dataTask(with: request) { data, response, error in
       if let error = error {
+        print("[GPSAuthAPI] OAuth Error: \(error)")
         completion(.failure(error))
         return
       }
@@ -52,6 +53,8 @@ class GPSAuthAPI {
         return
       }
 
+      print("[GPSAuthAPI] OAuth Response: \(responseString.prefix(500))")
+
       var result: [String: String] = [:]
       responseString.split(separator: "\n").forEach { line in
         let parts = line.split(separator: "=", maxSplits: 1)
@@ -60,14 +63,22 @@ class GPSAuthAPI {
         }
       }
 
+      print("[GPSAuthAPI] Parsed keys: \(result.keys.sorted())")
+
       if let error = result["Error"] {
+        print("[GPSAuthAPI] OAuth Error: \(error)")
         completion(.failure(GPSAuthError.loginError(error)))
         return
       }
 
       if let auth = result["Auth"] {
+        print("[GPSAuthAPI] OAuth Success: \(auth.prefix(50))...")
         completion(.success(auth))
       } else {
+        print(
+          "[GPSAuthAPI] No Auth in response. Available keys: \(Array(result.keys).joined(separator: ", "))"
+        )
+        print("[GPSAuthAPI] Full response: \(result)")
         completion(.failure(GPSAuthError.authenticationFailed))
       }
     }.resume()
