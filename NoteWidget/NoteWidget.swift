@@ -10,32 +10,47 @@ struct Provider: AppIntentTimelineProvider {
 
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry
   {
+    print("[Widget] snapshot called")
     let selectedId = configuration.note?.id
-    let notes = NoteManager.getSharedNotes()
+    print("[Widget] selectedId: \(selectedId ?? "nil")")
 
-    let note =
-      notes.first(where: { $0.id == selectedId }) ?? notes.first
-      ?? Note(
-        id: "placeholder", title: "Title", text: "Content", parentId: "root",
-        isArchived: false)
-    return SimpleEntry(note: note)
+    return await withCheckedContinuation { continuation in
+      NoteManager.getNotesFromGoogleKeep { notes in
+        print("[Widget] snapshot - received notes count: \(notes.count)")
+        let note =
+          notes.first(where: { $0.id == selectedId }) ?? notes.first
+          ?? Note(
+            id: "placeholder", title: "Title", text: "Content", parentId: "root",
+            isArchived: false)
+        print("[Widget] snapshot - selected note: \(note.title ?? "no title")")
+        continuation.resume(returning: SimpleEntry(note: note))
+      }
+    }
   }
 
   func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<
     SimpleEntry
   > {
+    print("[Widget] timeline called")
     let selectedId = configuration.note?.id
-    let notes = NoteManager.getSharedNotes()
+    print("[Widget] selectedId: \(selectedId ?? "nil")")
 
-    let displayNote =
-      notes.first(where: { $0.id == selectedId }) ?? notes.first
-      ?? Note(
-        id: "placeholder", title: nil, text: nil, parentId: "root", isArchived: false)
+    return await withCheckedContinuation { continuation in
+      NoteManager.getNotesFromGoogleKeep { notes in
+        print("[Widget] timeline - received notes count: \(notes.count)")
+        let displayNote =
+          notes.first(where: { $0.id == selectedId }) ?? notes.first
+          ?? Note(
+            id: "placeholder", title: nil, text: nil, parentId: "root", isArchived: false)
+        print("[Widget] timeline - selected note: \(displayNote.title ?? "no title")")
 
-    let entry = SimpleEntry(note: displayNote)
+        let entry = SimpleEntry(note: displayNote)
 
-    let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
-    return Timeline(entries: [entry], policy: .after(nextUpdate))
+        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date())!
+        print("[Widget] timeline - next update: \(nextUpdate)")
+        continuation.resume(returning: Timeline(entries: [entry], policy: .after(nextUpdate)))
+      }
+    }
   }
 }
 
@@ -72,12 +87,18 @@ struct NoteWidgetEntryView: View {
 
   private func backgroundColor(for note: Note) -> Color {
     switch note.color?.uppercased() {
-    case "YELLOW": return Color.yellow.opacity(0.22)
-    case "GREEN": return Color.green.opacity(0.20)
-    case "BLUE": return Color.blue.opacity(0.20)
-    case "RED": return Color.red.opacity(0.20)
-    case "ORANGE": return Color.orange.opacity(0.22)
-    default: return Color.white
+    case "RED": return Color(red: 0.95, green: 0.76, blue: 0.76)
+    case "ORANGE": return Color(red: 0.98, green: 0.85, blue: 0.70)
+    case "YELLOW": return Color(red: 0.99, green: 0.95, blue: 0.70)
+    case "GREEN": return Color(red: 0.80, green: 0.92, blue: 0.77)
+    case "TEAL": return Color(red: 0.64, green: 0.87, blue: 0.85)
+    case "BLUE": return Color(red: 0.81, green: 0.89, blue: 0.95)
+    case "DARK_BLUE": return Color(red: 0.56, green: 0.77, blue: 0.95)
+    case "PURPLE": return Color(red: 0.82, green: 0.77, blue: 0.91)
+    case "PINK": return Color(red: 0.97, green: 0.77, blue: 0.86)
+    case "BROWN": return Color(red: 0.91, green: 0.84, blue: 0.78)
+    case "GRAY": return Color(red: 0.89, green: 0.89, blue: 0.89)
+    default: return Color(red: 1.0, green: 1.0, blue: 1.0)
     }
   }
 }

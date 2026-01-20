@@ -1,5 +1,12 @@
 import Foundation
 
+struct Timestamps: Codable {
+  var created: String?
+  var updated: String?
+  var trashed: String?
+  var userEdited: String?
+}
+
 struct Note: Codable, Identifiable {
   var id: String
   var title: String?
@@ -9,6 +16,7 @@ struct Note: Codable, Identifiable {
   var type: String?
   var checked: Bool?
   var color: String?
+  var timestamps: Timestamps?
 }
 
 class GoogleKeepAPI {

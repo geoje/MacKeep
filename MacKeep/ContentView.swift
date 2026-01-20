@@ -168,6 +168,7 @@ struct ContentView: View {
 
                 let filteredNotes = notes.filter {
                   $0.parentId == "root" && ($0.isArchived ?? false) == false
+                    && ($0.timestamps?.trashed == nil || !$0.timestamps!.trashed!.starts(with: "2"))
                 }
                 self.alertMessage =
                   "\(filteredNotes.count) notes found\n\nNow try adding a widget from Notification Center or your Desktop!"

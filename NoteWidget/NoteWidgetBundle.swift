@@ -5,6 +5,5 @@ import WidgetKit
 struct NoteWidgetBundle: WidgetBundle {
   var body: some Widget {
     NoteWidget()
-    NoteWidgetControl()
   }
 }
