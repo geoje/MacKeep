@@ -9,31 +9,51 @@ struct WidgetNoteEntity: AppEntity {
 
   let id: String
   let title: String
+  let subtitle: String?
 
   var displayRepresentation: DisplayRepresentation {
-    DisplayRepresentation(title: .init(stringLiteral: title))
+    DisplayRepresentation(
+      title: .init(stringLiteral: title.isEmpty ? "Untitled" : title),
+      subtitle: subtitle.map { .init(stringLiteral: $0) }
+    )
   }
 }
 
 struct WidgetNoteQuery: EntityQuery {
+  private func loadNotes() async -> [Note] {
+    await withCheckedContinuation { continuation in
+      NoteManager.getNotesFromGoogleKeep { notes in
+        continuation.resume(returning: notes)
+      }
+    }
+  }
+
   func suggestedEntities() async throws -> [WidgetNoteEntity] {
-    let notes = NoteManager.getSharedNotes()
+    let notes = await loadNotes()
     let entities = notes.map { note in
-      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespaces) ?? ""
-      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : (note.text ?? "Untitled")
-      return WidgetNoteEntity(id: note.id, title: displayTitle)
+      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : "Untitled"
+      let textPreview = (note.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+      let subtitle = textPreview.isEmpty ? nil : String(textPreview.prefix(60))
+      return WidgetNoteEntity(id: note.id, title: displayTitle, subtitle: subtitle)
     }
     return entities
   }
 
   nonisolated func defaultResult() async -> [WidgetNoteEntity]? {
-    let notes = NoteManager.getSharedNotes()
-    let entities = notes.map { note in
-      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespaces) ?? ""
-      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : (note.text ?? "Untitled")
-      return WidgetNoteEntity(id: note.id, title: displayTitle)
+    let notes = await withCheckedContinuation { continuation in
+      NoteManager.getNotesFromGoogleKeep { notes in
+        continuation.resume(returning: notes)
+      }
     }
-    return entities
+
+    return notes.map { note in
+      let trimmedTitle = note.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      let displayTitle = !trimmedTitle.isEmpty ? trimmedTitle : "Untitled"
+      let textPreview = (note.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+      let subtitle = textPreview.isEmpty ? nil : String(textPreview.prefix(60))
+      return WidgetNoteEntity(id: note.id, title: displayTitle, subtitle: subtitle)
+    }
   }
 
   func entities(for identifiers: [String]) async throws -> [WidgetNoteEntity] {

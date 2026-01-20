@@ -77,7 +77,7 @@ struct NoteWidgetEntryView: View {
       Text(entry.note.text?.isEmpty == false ? entry.note.text! : "No Content")
         .font(.system(size: 12))
         .lineLimit(entry.note.title != nil && !entry.note.title!.isEmpty ? 8 : 10)
-        .foregroundColor(.secondary)
+        .foregroundColor(.primary)
 
       Spacer()
     }
