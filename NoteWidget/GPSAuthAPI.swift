@@ -6,6 +6,10 @@ struct OAuthToken {
 }
 
 class GPSAuthAPI {
+  // Google Play Services constants
+  private let CLIENT_SIG = "38918a453d07199354f8b19af05ec6562ced5788"
+  private let GOOGLE_PLAY_SERVICES_VERSION = 240_913_000
+
   private func generateRandomAndroidId() -> String {
     let random = UInt64.random(in: 0...UInt64.max)
     return String(format: "%016x", random)
@@ -36,9 +40,9 @@ class GPSAuthAPI {
       "operatorCountry": "us",
       "lang": "en",
       "sdk_version": 17,
-      "google_play_services_version": 240_913_000,
-      "client_sig": "38918a453d07199354f8b19af05ec6562ced5788",
-      "callerSig": "38918a453d07199354f8b19af05ec6562ced5788",
+      "google_play_services_version": GOOGLE_PLAY_SERVICES_VERSION,
+      "client_sig": CLIENT_SIG,
+      "callerSig": CLIENT_SIG,
       "droidguard_results": "dummy123",
     ]
 
@@ -113,12 +117,12 @@ class GPSAuthAPI {
       "source": "android",
       "androidId": generateRandomAndroidId(),
       "app": "com.google.android.keep",
-      "client_sig": "38918a453d07199354f8b19af05ec6562ced5788",
+      "client_sig": CLIENT_SIG,
       "device_country": "us",
       "operatorCountry": "us",
       "lang": "en",
       "sdk_version": 17,
-      "google_play_services_version": 240_913_000,
+      "google_play_services_version": GOOGLE_PLAY_SERVICES_VERSION,
     ]
 
     request.httpBody =
