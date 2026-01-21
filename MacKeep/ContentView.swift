@@ -3,6 +3,8 @@ import SwiftUI
 struct ContentView: View {
   @State private var email: String = ""
   @State private var masterToken: String = ""
+  @State private var oauthToken: String = ""
+  @State private var useOAuthToken: Bool = false
   @State private var showAlert = false
   @State private var alertMessage = ""
   @State private var isLoading = false
@@ -14,7 +16,12 @@ struct ContentView: View {
   var body: some View {
     VStack(spacing: 16) {
       inputField("Email", "example@gmail.com", text: $email)
-      tokenField()
+      authMethodToggle()
+      if useOAuthToken {
+        oauthTokenField()
+      } else {
+        tokenField()
+      }
       connectButton()
       debugLogView()
     }
@@ -40,6 +47,44 @@ struct ContentView: View {
         .fontWeight(.semibold)
       TextField(placeholder, text: text)
         .textFieldStyle(.roundedBorder)
+    }
+  }
+
+  private func authMethodToggle() -> some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Label("Authentication Method", systemImage: "lock.shield")
+        .fontWeight(.semibold)
+      Picker("", selection: $useOAuthToken) {
+        Text("Master Token").tag(false)
+        Text("OAuth Token").tag(true)
+      }
+      .pickerStyle(.segmented)
+    }
+  }
+
+  private func oauthTokenField() -> some View {
+    VStack(alignment: .leading, spacing: 8) {
+      HStack {
+        Label("OAuth Token (from browser)", systemImage: "key")
+          .fontWeight(.semibold)
+        Spacer()
+        Button(action: {
+          NSWorkspace.shared.open(
+            URL(string: "https://github.com/rukins/gpsoauth-java/blob/master/README.md#second-way")!
+          )
+        }) {
+          Image(systemName: "questionmark.circle")
+            .foregroundColor(.gray)
+            .font(.system(size: 14))
+        }
+        .buttonStyle(.plain)
+        .cursorHover()
+      }
+      SecureField("oauth2_4/**", text: $oauthToken)
+        .textFieldStyle(.roundedBorder)
+      Text("Copy from browser cookies at accounts.google.com/EmbeddedSetup")
+        .font(.caption)
+        .foregroundColor(.gray)
     }
   }
 
@@ -144,14 +189,44 @@ struct ContentView: View {
     let deviceId = UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "").prefix(16)
       .uppercased()
 
-    gpsAuthAPI.performOAuth(email: email, masterToken: masterToken, deviceId: String(deviceId)) {
+    if useOAuthToken {
+      // Flow: OAuth Token -> Master Token -> Access Token -> Notes
+      addLog("Using OAuth token to retrieve master token...")
+      gpsAuthAPI.exchangeToken(email: email, oauthToken: oauthToken, deviceId: String(deviceId)) {
+        result in
+        DispatchQueue.main.async {
+          switch result {
+          case .success(let retrievedMasterToken):
+            self.addLog("Successfully retrieved master token: \(retrievedMasterToken.prefix(20))...")
+            // Save the master token for future use
+            self.masterToken = retrievedMasterToken
+            self.defaults.set(retrievedMasterToken, forKey: "masterToken")
+            // Now use the master token to get access token
+            self.performOAuthWithMasterToken(
+              gpsAuthAPI: gpsAuthAPI, masterToken: retrievedMasterToken, deviceId: String(deviceId))
+          case .failure(let error):
+            self.showError("Failed to exchange OAuth token: \(error.localizedDescription)")
+          }
+        }
+      }
+    } else {
+      // Flow: Master Token -> Access Token -> Notes
+      performOAuthWithMasterToken(
+        gpsAuthAPI: gpsAuthAPI, masterToken: masterToken, deviceId: String(deviceId))
+    }
+  }
+
+  private func performOAuthWithMasterToken(
+    gpsAuthAPI: GPSAuthAPI, masterToken: String, deviceId: String
+  ) {
+    gpsAuthAPI.performOAuth(email: email, masterToken: masterToken, deviceId: deviceId) {
       result in
       DispatchQueue.main.async {
         switch result {
         case .success(let authToken):
           // Save email, masterToken, authToken to shared UserDefaults
           self.defaults.set(self.email, forKey: "email")
-          self.defaults.set(self.masterToken, forKey: "masterToken")
+          self.defaults.set(masterToken, forKey: "masterToken")
           self.defaults.set(authToken, forKey: "authToken")
 
           let keepAPI = GoogleKeepAPI()
