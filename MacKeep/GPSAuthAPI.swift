@@ -47,6 +47,8 @@ class GPSAuthAPI {
       "google_play_services_version": GOOGLE_PLAY_SERVICES_VERSION,
       "client_sig": CLIENT_SIG,
       "callerSig": CLIENT_SIG,
+      // Note: droidguard_results is a placeholder value used by gpsoauth
+      // This is a known limitation when reverse-engineering Google's APIs
       "droidguard_results": "dummy123",
     ]
 
