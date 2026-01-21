@@ -79,7 +79,7 @@ class GPSAuthAPI {
         return
       }
 
-      self.log("Token Exchange Response: \(responseString)")
+      self.log("Received token exchange response")
 
       let responseDict = responseString.split(separator: "\n").reduce(into: [String: String]()) {
         result, line in
@@ -165,7 +165,7 @@ class GPSAuthAPI {
         return
       }
 
-      self.log("OAuth Response: \(responseString)")
+      self.log("Received OAuth response")
 
       let responseDict = responseString.split(separator: "\n").reduce(into: [String: String]()) {
         result, line in

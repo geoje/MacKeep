@@ -197,7 +197,7 @@ struct ContentView: View {
         DispatchQueue.main.async {
           switch result {
           case .success(let retrievedMasterToken):
-            self.addLog("Successfully retrieved master token: \(retrievedMasterToken.prefix(20))...")
+            self.addLog("Successfully retrieved master token from OAuth token")
             // Save the master token for future use
             self.masterToken = retrievedMasterToken
             self.defaults.set(retrievedMasterToken, forKey: "masterToken")
