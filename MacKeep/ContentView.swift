@@ -138,25 +138,30 @@ struct ContentView: View {
     isLoading = true
     debugLogs.removeAll()
 
-    let gpsAuthAPI = GPSAuthAPI()
+    // Use App Group defaults in GPSAuthAPI for caching
+    let gpsAuthAPI = GPSAuthAPI(userDefaults: defaults)
     gpsAuthAPI.onLog = self.addLog
+    
+    // Invalidate cache to force fresh auth
+    gpsAuthAPI.invalidateCache()
 
-    let deviceId = UUID().uuidString.lowercased().replacingOccurrences(of: "-", with: "").prefix(16)
-      .uppercased()
-
-    gpsAuthAPI.performOAuth(email: email, masterToken: masterToken, deviceId: String(deviceId)) {
-      result in
+    gpsAuthAPI.performOAuth(
+      email: email, masterToken: masterToken, deviceId: getPersistentDeviceId()
+    ) { result in
       DispatchQueue.main.async {
         switch result {
-        case .success(let authToken):
+        case .success(let oauth):
           // Save email, masterToken, authToken to shared UserDefaults
           self.defaults.set(self.email, forKey: "email")
           self.defaults.set(self.masterToken, forKey: "masterToken")
-          self.defaults.set(authToken, forKey: "authToken")
+          self.defaults.set(oauth.token, forKey: "authToken")
+          if let expiry = oauth.expiry {
+            self.defaults.set(expiry.timeIntervalSince1970, forKey: "authTokenExpiry")
+          }
 
           let keepAPI = GoogleKeepAPI()
           keepAPI.onLog = self.addLog
-          keepAPI.fetchNotes(authToken: authToken) { notesResult in
+          keepAPI.fetchNotes(authToken: oauth.token) { notesResult in
             DispatchQueue.main.async {
               self.isLoading = false
               switch notesResult {
@@ -184,6 +189,16 @@ struct ContentView: View {
         }
       }
     }
+  }
+
+  private func getPersistentDeviceId() -> String {
+    if let existing = defaults.string(forKey: "deviceId"), !existing.isEmpty {
+      return existing
+    }
+    let hex = UUID().uuidString.replacingOccurrences(of: "-", with: "").lowercased()
+    let deviceId = String(hex.prefix(16))
+    defaults.set(deviceId, forKey: "deviceId")
+    return deviceId
   }
 
   private func showError(_ message: String) {

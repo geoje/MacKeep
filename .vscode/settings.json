@@ -1,9 +1,0 @@
-{
-  "sweetpad.build.xcodeWorkspacePath": "MacKeep.xcodeproj/project.xcworkspace",
-  "editor.tabSize": 2,
-  "editor.formatOnSave": true,
-  "editor.insertSpaces": true,
-  "[swift]": {
-    "editor.defaultFormatter": "sweetpad.sweetpad"
-  }
-}

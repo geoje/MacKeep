@@ -10,6 +10,10 @@
 		855CB18F2F1D418E00156613 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3B2F1C1B0D004E27AB /* WidgetKit.framework */; };
 		855CB1902F1D418E00156613 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85789E3D2F1C1B0D004E27AB /* SwiftUI.framework */; };
 		855CB19F2F1D418F00156613 /* NoteWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		85670E532F24163600F2A21A /* GPSAuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85670E512F24163600F2A21A /* GPSAuthAPI.swift */; };
+		85670E542F24163600F2A21A /* GoogleKeepAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85670E502F24163600F2A21A /* GoogleKeepAPI.swift */; };
+		85670E552F24163600F2A21A /* GPSAuthAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85670E512F24163600F2A21A /* GPSAuthAPI.swift */; };
+		85670E562F24163600F2A21A /* GoogleKeepAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85670E502F24163600F2A21A /* GoogleKeepAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,10 +42,11 @@
 
 /* Begin PBXFileReference section */
 		855CB18E2F1D418E00156613 /* NoteWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = NoteWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		85670E502F24163600F2A21A /* GoogleKeepAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleKeepAPI.swift; sourceTree = "<group>"; };
+		85670E512F24163600F2A21A /* GPSAuthAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSAuthAPI.swift; sourceTree = "<group>"; };
 		85789E272F1C1A32004E27AB /* Mac Keep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mac Keep.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		85789E3B2F1C1B0D004E27AB /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		85789E3D2F1C1B0D004E27AB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		85DA19D12F1D4A0A0094418F /* NoteWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NoteWidgetExtension.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -90,10 +95,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		85670E522F24163600F2A21A /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				85670E502F24163600F2A21A /* GoogleKeepAPI.swift */,
+				85670E512F24163600F2A21A /* GPSAuthAPI.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
 		85789E1E2F1C1A32004E27AB = {
 			isa = PBXGroup;
 			children = (
-				85DA19D12F1D4A0A0094418F /* NoteWidgetExtension.entitlements */,
+				85670E522F24163600F2A21A /* Service */,
 				85789E292F1C1A32004E27AB /* MacKeep */,
 				855CB1912F1D418E00156613 /* NoteWidget */,
 				85789E3A2F1C1B0D004E27AB /* Frameworks */,
@@ -228,6 +242,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85670E552F24163600F2A21A /* GPSAuthAPI.swift in Sources */,
+				85670E562F24163600F2A21A /* GoogleKeepAPI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +251,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				85670E532F24163600F2A21A /* GPSAuthAPI.swift in Sources */,
+				85670E542F24163600F2A21A /* GoogleKeepAPI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,7 +272,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = NoteWidgetExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NoteWidget/NoteWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -298,7 +316,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = NoteWidgetExtension.entitlements;
+				CODE_SIGN_ENTITLEMENTS = NoteWidget/NoteWidgetExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
