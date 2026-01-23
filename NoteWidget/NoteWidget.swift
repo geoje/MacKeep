@@ -83,6 +83,7 @@ struct NoteWidgetEntryView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     .containerBackground(backgroundColor(for: entry.note), for: .widget)
+    .widgetURL(URL(string: "https://keep.google.com/u/0/#NOTE/\(entry.note.id)"))
   }
 
   private func backgroundColor(for note: Note) -> Color {
